@@ -5,7 +5,9 @@ from django.http import Http404
 from django.urls import reverse
 from django.views import generic
 from .models import Choice, Question
-
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 # def index(request):
 #     latest_question_list = Question.objects.order_by('-pub_date')[:5]
@@ -20,8 +22,13 @@ from .models import Choice, Question
 #     question = get_object_or_404(Question, pk=question_id)
 #     return render(request, 'polls/results.html', {'question': question})
 
+
 # using generic views 
-class IndexView(generic.ListView):
+# class LoginView(generic.ListView):
+#     redirect_field_name = '/polls/index.html'
+#     redirect_authenticated_user= 'True'
+
+class IndexView(LoginRequiredMixin ,generic.ListView):
     template_name = 'polls/index.html'
     context_object_name = 'latest_question_list'
 
@@ -29,11 +36,11 @@ class IndexView(generic.ListView):
         """Return the last five published questions."""
         return Question.objects.order_by('-pub_date')[:5]
 
-class DetailView(generic.DetailView):
+class DetailView(LoginRequiredMixin ,generic.DetailView):
     model = Question
     template_name = 'polls/detail.html'
 
-class ResultsView(generic.DetailView):
+class ResultsView(LoginRequiredMixin ,generic.DetailView):
     model = Question
     template_name = 'polls/results.html'
 
